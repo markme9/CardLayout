@@ -9,8 +9,6 @@ import SwiftUI
 
 struct ContentView: View {
     
-    @State var searchName: String = ""
-    
     @EnvironmentObject var person: Model
     
     @State var isPresented: Bool = false
@@ -21,47 +19,41 @@ struct ContentView: View {
         NavigationView {
             ScrollView {
                 VStack(alignment: .leading) {
-                    ForEach(self.filterArray) { item in
+                    ForEach(self.person.newPerson) { item in
                         RowList(data: item)
                             .scaleEffect(x: 1, y: -1, anchor: .center)
                         
                     }
-                    .searchable(text: $searchName, placement: .toolbar)
                     
-                    
-                }.scaleEffect(x: 1, y: -1, anchor: .center)
-                
-            }
-            .navigationTitle(Text("People"))
-            
-            .navigationBarItems(trailing: Button(action: {
-                withAnimation {
-                    self.isPresented.toggle()
-                    self.popieButton = false
                 }
-            }, label: {
-                Image(systemName: "plus")
-                    .font(.system(size: 12, weight: .semibold, design: .rounded))
-                    .frame(width: 30, height: 30)
-                    .background(Color.pink)
-                    .foregroundColor(.white)
-                    .clipShape(Circle())
-                    .shadow(radius: 10)
-            }))
-            .fullScreenCover(isPresented: $isPresented) {
-                UserDetails(dismissedView: $isPresented, person: { data in
-                    self.person.newPerson.append(data)
-                })
+                .scaleEffect(x: 1, y: -1, anchor: .center)
+                .navigationTitle(Text("People"))
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Button(action: {
+                            withAnimation {
+                                self.isPresented.toggle()
+                                self.popieButton = false
+                            }
+                        }, label: {
+                            Image(systemName: "plus")
+                                .font(.system(size: 12, weight: .semibold, design: .rounded))
+                                .frame(width: 30, height: 30)
+                                .background(Color.pink)
+                                .foregroundColor(.white)
+                                .clipShape(Circle())
+                                .shadow(radius: 10)
+                        })
+                        .fullScreenCover(isPresented: $isPresented) {
+                            UserDetails(dismissedView: $isPresented, person: { data in
+                                self.person.newPerson.append(data)
+                            })
+                        }
+                    }
+                    
+                }
                 
             }
-        }
-    }
-    var filterArray: [Person] {
-        if searchName.isEmpty {
-            return person.newPerson
-        }else {
-            return person.newPerson.filter{$0.name.localizedCaseInsensitiveContains(searchName)}
-            
         }
     }
 }
